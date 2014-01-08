@@ -33,4 +33,10 @@ android {
 dependencies {
     compile 'com.android.support:support-v4:18.0.0'
     compile 'com.google.android.gms:play-services:4.0.30'
+    compile 'com.google.api-client:google-api-client-android:1.17.0-rc'
+    compile 'com.google.http-client:google-http-client-android:1.17.0-rc'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.google.guava:guava:16.0-rc1'
+    compile 'org.codehaus.jackson:jackson-core-asl:1.9.13'
+    compile 'com.google.protobuf:protobuf-java:2.5.0'
 }
