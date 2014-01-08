@@ -52,8 +52,8 @@ public class MapActivity extends Activity {
 			// Enable / Disable zooming functionality
             googleMap.getUiSettings().setZoomGesturesEnabled( true );
 
-			double latitude = 51.04184;
-			double longitude = 0.51921;
+			double latitude = 51.069175;    //51.07224    51.06611
+			double longitude = -0.85632;    //-0.87317    -0.85632
 
 			// lets place some 10 random markers
 //			for (int i = 0; i < 10; i++) {
