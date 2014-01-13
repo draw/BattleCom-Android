@@ -1,6 +1,7 @@
 package net.euroboxonline.battlecom;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -11,7 +12,12 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapActivity extends Activity {
 
@@ -28,11 +34,7 @@ public class MapActivity extends Activity {
 			initilizeMap();
 
 			// Changing map type
-			// googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 			googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-			// googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-			// googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-			// googleMap.setMapType(GoogleMap.MAP_TYPE_NONE);
 
 			// Showing / hiding your current location
 			// googleMap.setMyLocationEnabled( false );
@@ -50,70 +52,89 @@ public class MapActivity extends Activity {
             googleMap.getUiSettings().setRotateGesturesEnabled( true );
 
 			// Enable / Disable zooming functionality
-            googleMap.getUiSettings().setZoomGesturesEnabled( true );
+            googleMap.getUiSettings().setZoomGesturesEnabled( false );
+
+            googleMap.setOnMapClickListener( new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick( LatLng latLng )
+                {
+                    MarkerOptions marker = new MarkerOptions().position( latLng )
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+					        .title("Objective Marker");
+
+                    googleMap.addMarker( marker );
+                }
+            });
+
+            googleMap.setOnMarkerClickListener( new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick( Marker marker )
+                {
+                    marker.remove();
+
+                    return false;
+                }
+            });
+
+//            googleMap.setOnMyLocationChangeListener( new GoogleMap.OnMyLocationChangeListener() {
+//                @Override
+//                public void onMyLocationChange(Location location)
+//                {
+//                    CameraPosition cameraPosition = new CameraPosition.Builder()
+//                            .target(new LatLng(location.getLatitude(), location.getLongitude())).build();
+//
+//                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//                }
+//            });
+
+//            googleMap.setLocationSource( new LocationSource() {
+//                @Override
+//                public void activate(OnLocationChangedListener onLocationChangedListener)
+//                {
+//
+//                }
+//
+//                @Override
+//                public void deactivate()
+//                {
+//
+//                }
+//            });
 
 			double latitude = 51.069175;    //51.07224    51.06611
-			double longitude = -0.85632;    //-0.87317    -0.85632
+			double longitude = -0.864745;    //-0.87317    -0.85632
 
-			// lets place some 10 random markers
-//			for (int i = 0; i < 10; i++) {
-//				// random latitude and logitude
-//				double[] randomLocation = createRandLocation(latitude,
-//						longitude);
-//
-//				// Adding a marker
-//				MarkerOptions marker = new MarkerOptions().position(
-//						new LatLng(randomLocation[0], randomLocation[1]))
-//						.title("Hello Maps " + i);
-//
-//				Log.d("Random", "> " + randomLocation[0] + ", "
-//						+ randomLocation[1]);
+			CameraPosition cameraPosition = new CameraPosition.Builder()
+							.target(new LatLng(latitude, longitude)).zoom(15).build();
 
-				// changing marker color
-//				if (i == 0)
-//					marker.icon(BitmapDescriptorFactory
-//							.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-//				if (i == 1)
-//					marker.icon(BitmapDescriptorFactory
-//							.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-//				if (i == 2)
-//					marker.icon(BitmapDescriptorFactory
-//							.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
-//				if (i == 3)
-//					marker.icon(BitmapDescriptorFactory
-//							.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-//				if (i == 4)
-//					marker.icon(BitmapDescriptorFactory
-//							.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-//				if (i == 5)
-//					marker.icon(BitmapDescriptorFactory
-//							.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-//				if (i == 6)
-//					marker.icon(BitmapDescriptorFactory
-//							.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-//				if (i == 7)
-//					marker.icon(BitmapDescriptorFactory
-//							.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-//				if (i == 8)
-//					marker.icon(BitmapDescriptorFactory
-//							.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
-//				if (i == 9)
-//					marker.icon(BitmapDescriptorFactory
-//							.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-//
-//				googleMap.addMarker(marker);
+			googleMap.animateCamera(CameraUpdateFactory
+						.newCameraPosition(cameraPosition));
 
-				// Move the camera to last position with a zoom level
-//				if (i == 9) {
-					CameraPosition cameraPosition = new CameraPosition.Builder()
-							.target( new LatLng( latitude, longitude ) ).zoom(15).build();
+            BattleComApplication app = (BattleComApplication) getApplicationContext();
 
-					googleMap.animateCamera(CameraUpdateFactory
-							.newCameraPosition(cameraPosition));
-//				}
-//			}
+            Zone zone = (Zone) app.retrieve( "gameZone" );
 
-		} catch (Exception e) {
+            if ( zone ==null )
+            {
+                Toast.makeText( getApplicationContext(), "No Zone Info loaded", Toast.LENGTH_LONG ).show();
+            }
+            else
+            {
+                addZone( zone );
+            }
+
+            Location location = (Location) app.retrieve( "location" );
+
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+
+            MarkerOptions marker = new MarkerOptions().position( new LatLng(latitude, longitude) )
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE ) )
+                    .title("Trakker");
+
+            googleMap.addMarker( marker );
+
+        } catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -151,4 +172,18 @@ public class MapActivity extends Activity {
 				longitude + ((Math.random() - 0.5) / 500),
 				150 + ((Math.random() - 0.5) * 10) };
 	}
+
+
+    private void addZone( Zone zone )
+    {
+        List<LatLng> points = new ArrayList<LatLng>();
+
+        for( Location location : zone.getCoordinates() )
+        {
+            points.add(  new LatLng( location.getLatitude(), location.getLongitude() ) );
+        }
+
+        googleMap.addPolyline( new PolylineOptions().color( Color.WHITE ).width( 1 ).addAll( points )  );
+    }
+
 }
