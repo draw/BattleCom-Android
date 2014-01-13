@@ -27,6 +27,8 @@ public class SplashScreen extends Activity {
     private Location location = null;
 
     private Zone gameZone = null;
+    private Zone safeZone = null;
+    private Zone respawn = null;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,12 +75,6 @@ public class SplashScreen extends Activity {
         @Override
         protected Void doInBackground(Void... arg0)
         {
-            long id;
-            double latitude;
-            double longitude;
-
-            String description = null;
-            List<Location> coordinates = null;
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 			/*
@@ -93,16 +89,20 @@ public class SplashScreen extends Activity {
 			 */
             JsonParser jsonParser = new JsonParser();
             String json = jsonParser.getJSONFromUrl( "http://euroboxonline.net:9000/location" );
-
             Log.e("Response: ", "> " + json);
-
             location = gson.fromJson( json, Location.class );
 
-            json = jsonParser.getJSONFromUrl( "http://euroboxonline.net:9000/zone" );
-
+            json = jsonParser.getJSONFromUrl( "http://euroboxonline.net:9000/zone?name=gameZone" );
             Log.e("Response: ", "> " + json);
-
             gameZone = gson.fromJson( json, Zone.class );
+
+            json = jsonParser.getJSONFromUrl( "http://euroboxonline.net:9000/zone?name=safeZone" );
+            Log.e("Response: ", "> " + json);
+            safeZone = gson.fromJson( json, Zone.class );
+
+            json = jsonParser.getJSONFromUrl( "http://euroboxonline.net:9000/zone?name=respawn" );
+            Log.e("Response: ", "> " + json);
+            respawn = gson.fromJson( json, Zone.class );
 
             return null;
         }
@@ -149,6 +149,9 @@ public class SplashScreen extends Activity {
 
             app.save( "location", location );
             app.save( "gameZone", gameZone );
+            app.save( "safeZone", safeZone );
+            app.save( "respawn", respawn );
+
 
             Intent i = new Intent( SplashScreen.this, MapActivity.class );
             startActivity( i );

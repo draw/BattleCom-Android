@@ -52,7 +52,7 @@ public class MapActivity extends Activity {
             googleMap.getUiSettings().setRotateGesturesEnabled( true );
 
 			// Enable / Disable zooming functionality
-            googleMap.getUiSettings().setZoomGesturesEnabled( false );
+            googleMap.getUiSettings().setZoomGesturesEnabled( true );
 
             googleMap.setOnMapClickListener( new GoogleMap.OnMapClickListener() {
                 @Override
@@ -104,23 +104,31 @@ public class MapActivity extends Activity {
 			double latitude = 51.069175;    //51.07224    51.06611
 			double longitude = -0.864745;    //-0.87317    -0.85632
 
-			CameraPosition cameraPosition = new CameraPosition.Builder()
-							.target(new LatLng(latitude, longitude)).zoom(15).build();
-
-			googleMap.animateCamera(CameraUpdateFactory
-						.newCameraPosition(cameraPosition));
-
             BattleComApplication app = (BattleComApplication) getApplicationContext();
 
             Zone zone = (Zone) app.retrieve( "gameZone" );
 
-            if ( zone ==null )
+            if ( zone == null )
             {
                 Toast.makeText( getApplicationContext(), "No Zone Info loaded", Toast.LENGTH_LONG ).show();
             }
             else
             {
-                addZone( zone );
+                addZone( zone, Color.RED );
+            }
+
+            zone = (Zone) app.retrieve( "safeZone" );
+
+            if ( zone != null )
+            {
+                addZone( zone, Color.BLUE );
+            }
+
+            zone = (Zone) app.retrieve( "respawn" );
+
+            if ( zone != null )
+            {
+                addZone( zone, Color.GREEN );
             }
 
             Location location = (Location) app.retrieve( "location" );
@@ -134,7 +142,15 @@ public class MapActivity extends Activity {
 
             googleMap.addMarker( marker );
 
-        } catch (Exception e) {
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(new LatLng(latitude, longitude)).zoom((float) 17.8).build();
+
+            googleMap.animateCamera(CameraUpdateFactory
+                    .newCameraPosition(cameraPosition));
+
+        }
+        catch (Exception e)
+        {
 			e.printStackTrace();
 		}
 
@@ -174,7 +190,7 @@ public class MapActivity extends Activity {
 	}
 
 
-    private void addZone( Zone zone )
+    private void addZone( Zone zone, int color )
     {
         List<LatLng> points = new ArrayList<LatLng>();
 
@@ -183,7 +199,7 @@ public class MapActivity extends Activity {
             points.add(  new LatLng( location.getLatitude(), location.getLongitude() ) );
         }
 
-        googleMap.addPolyline( new PolylineOptions().color( Color.WHITE ).width( 1 ).addAll( points )  );
+        googleMap.addPolyline( new PolylineOptions().color( color ).width( 2 ).addAll(points) );
     }
 
 }
